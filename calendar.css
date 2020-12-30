@@ -11,27 +11,80 @@ th {
   vertical-align: top;
 }
 
+.month_header { 
+  direction: rtl; 
+  margin-top: 8px; 
+  text-align: center; 
+  font-weight: bold; 
+  font-style: italic 
+}
+
+
+.calendar {
+  direction: rtl;
+}
+
+.daysheader {
+  background: #C0C0C0;
+  height: auto;
+  text-align: center;
+}
+
+.day-td {
+  border: 1px solid #A8A8A8;
+
+}
+
 .day-cell {
   height: 150px;
   width: 150px;
-  padding: 10px;
-  border: 1px solid #A8A8A8;
-  vertical-align: top;
+  padding: 5px;
+
+  xdisplay: table;
+  xvertical-align: top;
+  display: flex;
+  flex-direction: column;
+  justify-content:space-between;
 }
 
+.day-title-group {
 
-.date-row {
-    border: none;
-    height:min-content;
+}
+
+.day-title{
+  font-weight: bold;
+  text-align: center;
+
+}
+.time-item {
+  color: #FF0000;
+}
+.time-group {
+  text-align:left;
+}
+
+.title-row {
+  display: flex;
+  justify-content:space-between;
+  direction: rtl;
 }
 .heb-date {
-    float: right;
+    float: left;
+    
     border: none;
 }
 
 .eng-date {
     float: left;
 }
+
+.birthday {
+  font-size:100%; 
+  font-weight: bold;
+  text-align: center;
+  vertical-align: middle;
+  clear:both;
+};
 
 
 .divcalendar {
@@ -119,11 +172,6 @@ th {
   clear: both;
 }
 
-.daysheader {
-  background: #C0C0C0;
-  height: auto;
-  text-align: center;
-}
 
 #prevmonthdates {
   background-color: #E0E0E0;

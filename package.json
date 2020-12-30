@@ -9,6 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@hebcal/core": "^2.11.0"
+    "@hebcal/core": "^2.11.0",
+    "lodash": "^4.17.20"
   }
 }

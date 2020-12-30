@@ -1,5 +1,7 @@
-let {HebrewCalendar, HDate, Location, Event} = require('@hebcal/core');
+//let {HebrewCalendar, HDate, Location, Event} = require('@hebcal/core');
+let HebCal = require('@hebcal/core');
 let {HebUtils} = require('./gematriya.js');
+let genMonthHtml = require('./htmlbuilder.js');
 
 
 class Day {
@@ -16,212 +18,158 @@ class Day {
       this.month = month;
       this.date = date;
       this.isActiveMonth = activeMonth;
-      this.#dateObj = new Date(year, month, date);
-      this.#hebDate = new HDate(this.#dateObj);
+      this.#hebDate = new HebCal.HDate(date, month, year);
+      this.#dateObj = this.#hebDate.greg();
 
       
 
     }
+    get englishDate() {
+        return this.#dateObj.getDate();
+    }
 
     get dayOfWeek() {
-        return this.dateObj.getDay();
+        return this.#dateObj.getDay();
     }
 
     get hebrewDate() {
         let hu = new HebUtils();
         return hu.gematriya(this.#hebDate.getDate());
     }
+
+    get fullHebrewDate() {
+        return this.#hebDate;
+    }
+
+    get fullEnglishDate() {
+        return this.#dateObj;
+    }
 }
 
 
-
-function startHTML() {
-    return  `
-<HTML>
-<HEAD>
-<title>Calendar Month</title>
-<meta charset="UTF-8">
-  <link rel="stylesheet"  href="calendar.css" />
-<BODY>
-
-    
-    `;
-}
-
-function endHTML() {
-    return `
-</BODY>
-</HTML>
-    `;
-}
+// Events
 
 
-function genDaysOfWeek(year, month, firstdate) {
-    let days = [];
-    let prevYear = (month > 0) ? year : year-1;
-    let prevMonth = (month > 0) ? month-1 : 11;
-    let lastDateOfPrev = new Date(prevYear, prevMonth+1, 0).getDate();
-    let lastDateOfCurrentMonth = new Date(year, month+1, 0).getDate();
-    
 
-    let firstDayOfCurrentWeek = new Date(year, month, firstdate).getDay();
+function genDaysOfWeek(monthConfig, firstDate ) {
+   // let firstDayOfCurrentWeek = new Date(year, month, firstdate).getDay();
+   let firstDayOfCurrentWeek = new HebCal.HDate(firstDate, monthConfig.month, monthConfig.year).getDay(); 
+let days = [];
+
     for (let i=0; i<firstDayOfCurrentWeek; i++) {
-        days.push(new Day(prevYear, prevMonth, lastDateOfPrev - (firstDayOfCurrentWeek-i-1), false));
+        days.push(new Day(monthConfig.prevYear, monthConfig.prevMonth, 
+                          monthConfig.daysInPrev - (firstDayOfCurrentWeek-i-1), false));
     } 
 
-    let currDate = firstdate;
+    let currDate = firstDate;
     let overFlow = 1;
     while (days.length < 7)  {
-        if (currDate <= lastDateOfCurrentMonth) {
-        days.push( new Day(year, month, currDate++, true));
+        if (currDate <= monthConfig.daysInMonth) {
+            days.push( new Day(monthConfig.year, monthConfig.month, currDate++, true));
         } else {
-            days.push(new Day(year, month+1,overFlow++, false) );
+            days.push(new Day(monthConfig.year, monthConfig.month+1,overFlow++, false) );
         }
 
     }
     days[3].birthdays.push({name: "ישראל ישראלי"});
-    days[5].birthdays.push({name: "ישראל ישראלי"});
+    days[5].birthdays.push({name: "ישראלה ישראלי"});
 
 
     
     return {maxDate:currDate, days};
 }
 
-function genDayRow(daysOfWeek) {
-        // Write the header of the days of the week
-    let html = '<tr>';
-    daysOfWeek.forEach(d => {
-        html += `<th class="daysheader">${d}</th>`;
-    });
+function genWeeks(year, month) {
+    let prevYear = (month > 0) ? year : year-1;
+    let prevMonth = (month > 0) ? month-1 : 11;
+    let monthConfig = {
+        year, 
+        month, 
+        prevYear,
+        prevMonth,
+        prevYear: (month > 0) ? year : year-1,
+        prevMonth: (month > 0) ? month-1 : 11,
+        daysInMonth: HebCal.HDate.daysInMonth(month, year),
+        daysInPrev: HebCal.HDate.daysInMonth(prevMonth, prevYear),
+    };
+
+    let weeks = [];
     
-    html += '</tr>';
+    let currDate = 1;
+    while(currDate <= monthConfig.daysInMonth) {
+        let {maxDate, days} = genDaysOfWeek(monthConfig, currDate);
+        weeks.push(days);
+        currDate = maxDate;
+    }   
 
-    return html;
+    return { weeks, monthConfig };  
 }
 
 
-function genDayHTML(day) {
-    let xhtml = `
-        <td class="day-cell" id="currentmonthdates">
-            <table class="date-row"><tr>
-            <td class="eng-date"> ${day.date} </td>
-            <td class="heb-date"> ${day.hebrewDate} </td>
-            </tr>
-            </table>
-            `;
-    let html = `
-    <td class="day-cell" id="currentmonthdates">
-
-                  <div class="day_number_row">
-                  <span class="heb-date">${day.hebrewDate} </span> 
-                  <span class="eng-date">${day.date}</span>
-                  </div>`;
-    day.birthdays.forEach( b => {
-        html += ` 
-            <div class="birthday">${b.name}</div>
-        `;
-    })        
-
-    html += `        
-        </td>
-    
-    `;
-
-    return html;
-}
-
-
-function genWeekHTML(days) {
-    let html = "<tr>";
-
-    days.forEach(d=> {
-        if (d.isActiveMonth) {
-            html += genDayHTML(d);
-        } else {
-
-            html +=  '<td id="prevmonthdates">' + 
-            '<span id="cellvaluespan">' + (d.date) + '</span><br/>' + 
-            '<ul id="cellvaluelist"><li>apples</li><li>bananas</li><li>pineapples</li></ul>' + 
-          '</td>';
-        }
-    })
-
-    html += '</tr>';
-
-    return html;
-}
 
 // Show month (year, month)
-function genMonth(y,m) {
-    let DaysOfWeek = [
-        'SUN',
-        'MON',
-        'TUE',
-        'WED',
-        'THU',
-        'FRI',
-        'SAT'
-        ];
-    let Months =['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec' ];
-    
-    let Format = 'dd/mm/yyyy';
-    let f = 'M';
+function genMonth(year,month) {
+
+
+    let currDate = 1;
+    while(currDate < lastDateOfCurrentMonth) {
+        let {maxDate, days} = genDaysOfWeek(year, month, currDate);
+        html += genWeekHTML(days, events);
+        currDate = maxDate;
+    }
   
-   CurrentYear = y;
-  
-    CurrentMonth = m ;
-  
+     
+
   
     // 1st day of the selected month
     let firstDayOfCurrentMonth = new Date(y, m, 1).getDay();
   
     // Last date of the selected month
     let lastDateOfCurrentMonth = new Date(y, m+1, 0).getDate();
-  
-    // Last day of the previous month
-    let lastDateOfLastMonth = m == 0 ? new Date(y-1, 11, 0).getDate() : new Date(y, m, 0).getDate();
+
+    let events = createEvents(year,month);
+
+    genMonthHtml(year, month)
+
+ };
+
+function createEvents(year, month) {
+    const options = {
+        year: year,
+        isHebrewYear: true,
+        candlelighting: true,
+        location: HebCal.Location.lookup('Jerusalem'),
+        il: true,
+        sedrot: true,
+        omer: true,
+        //locale: 'he',
+        month: month,
+      };
+      const events = HebCal.HebrewCalendar.calendar(options);
+      return events;
+      
+}
+
+function genCalendar(year, month) {
 
 
 
-  
-    // Write selected month and year. This HTML goes into <div id="month"></div>
-    let monthandyearhtml = '<span id="monthandyearspan">' + Months[m] + ' - ' + y + '</span>';
-  
-    let html = '<table>';
-  
-    html += genDayRow(DaysOfWeek);
+    let events = createEvents(year,month);
 
-        
-    let currDate = 1;
-    while(currDate < lastDateOfCurrentMonth) {
-        let {maxDate, days} = genDaysOfWeek(CurrentYear, CurrentMonth, currDate);
-        html += genWeekHTML(days);
-        currDate = maxDate;
-    }
-  
-     
+    let { weeks, monthConfig } = genWeeks(year, month);
 
-    
-    // Closes table
-    html += '</table>';
-  
 
-    return html;
-};
+    let doc = genMonthHtml(monthConfig, weeks, events);
 
 
 
-function genCalendar() {
-    let h = startHTML();
+    console.log(doc);
 
-    let body = genMonth(2021, 4);
+    // let d = new Day(2000, 12, 12, true);
+    // console.log(d.constructor);
 
-
-    let end = endHTML();
-
-    console.log(h);
-    console.log(body);
-    console.log(end);
+    // let ev = createEvents(2020, 11);
+    // ev.forEach(e => console.log(e.constructor));
 
     // let hd = new HDate(new Date(2020, 11, 27));
     // console.log(hd);
@@ -233,4 +181,4 @@ function genCalendar() {
 }
 
 
-genCalendar();
+genCalendar(5781, 3);
