@@ -11,6 +11,12 @@ th {
   vertical-align: top;
 }
 
+
+
+/**************
+* Overall Stuff
+***************/
+
 .month_header { 
   direction: rtl; 
   margin-top: 8px; 
@@ -30,9 +36,12 @@ th {
   text-align: center;
 }
 
+
+/****************************************
+Day Layout
+*****************************************/
 .day-td {
   border: 1px solid #A8A8A8;
-
 }
 
 .day-cell {
@@ -40,12 +49,27 @@ th {
   width: 150px;
   padding: 5px;
 
-  xdisplay: table;
-  xvertical-align: top;
   display: flex;
   flex-direction: column;
   justify-content:space-between;
 }
+
+.shabbat {
+  background-color: aquamarine;
+}
+
+.holiday {
+  background-color: beige;
+}
+
+.plain-day {
+  background-color: white;
+}
+
+/********************************
+Title Section
+*********************************/
+
 
 .day-title-group {
 
@@ -56,35 +80,96 @@ th {
   text-align: center;
 
 }
-.time-item {
-  color: #FF0000;
-}
-.time-group {
-  text-align:left;
-}
 
 .title-row {
   display: flex;
   justify-content:space-between;
   direction: rtl;
 }
+
 .heb-date {
-    float: left;
-    
-    border: none;
+  float: left;
+  
+  border: none;
 }
 
 .eng-date {
-    float: left;
+  float: left;
 }
 
+
+
+
 .birthday {
-  font-size:100%; 
-  font-weight: bold;
   text-align: center;
   vertical-align: middle;
-  clear:both;
+  background-color: lightsalmon;
 };
+
+.birthday-name {
+  font-size:100%; 
+  font-weight: bold;
+}
+
+.birthday-img {
+  height: 1em;
+
+}
+
+.yahrzeit {
+  text-align: center;
+  vertical-align: middle;
+  background-color:mediumorchid;
+};
+
+.yahrzeit-name {
+  font-size:100%; 
+  font-weight: bold;
+}
+
+.yahrzeit-img {
+  height: 1em;
+
+}
+
+.anniv {
+  display: flex;
+  justify-content:center;
+  background-color: pink;
+}
+
+.anniv-img {
+  float: right;
+  height: 1em;
+}
+
+
+/*************************************
+* Footer
+**************************************/
+
+.footer-row {
+  display: flex;
+  justify-content:space-between;
+}
+
+.time-item {
+  xcolor: #FF0000;
+}
+.time-group {
+  text-align:left;
+}
+
+.footer-item {
+
+}
+.footer-group {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+
+}
+
 
 
 .divcalendar {
@@ -93,84 +178,9 @@ th {
     /*background-color: #FFCC00;*/
 }
 
-/* Wrapper div. That makes the inner div into an inline element that can be centered with text-align.*/
-#calendaroverallcontrols {
-  text-align: center;
-}
 
-/* This is a fluid div as width will be changing */
-#calendarmonthcontrols {
-  display: inline-block;
-  /*background-color: #FF0000;*/
-}
 
-#calendarmonthcontrols > div, #calendarmonthcontrols > a {
-    display: inline-block;
-}    
 
-#btnPrevYr {
-  text-decoration: none;
-  font-size: 35px;
-  vertical-align: middle;
-  /*background: #00FFCC;*/      
-}
-
-#btnPrev {
-  text-decoration: none;
-  font-size: 35px;
-  margin-left: 20px;
-  vertical-align: middle;
-  /*background: #00FFCC;*/
-}    
-
-/*.yearspan {
-  font-size: 20px;
-  font-weight: bold;
-  float: left;
-  margin-left: 5px;
-  margin-right: 5px;
-}
-
-.monthspan {
-  font-size: 20px;
-  font-weight: bold;
-  float: left;
-  margin-left: 5px;
-  margin-right: 5px;
-}*/
-
-#monthandyearspan {
-  width: 50px;
-  font-size: 25px;
-  font-weight: bold;
-  margin-left: 20px;
-  margin-right: 20px;
-  vertical-align: middle;
-  /*background: #00FFCC;*/
-}    
-
-#monthandyear {
-  vertical-align: middle;
-}
-
-#btnNext {
-  text-decoration: none;
-  font-size: 35px;
-  margin-right: 20px;
-  vertical-align: middle;
-  /*background: #00FFCC;*/
-}
-
-#btnNextYr {
-  text-decoration: none;
-  font-size: 35px;
-  vertical-align: middle;
-  /*background: #00FFCC;*/
-}        
-
-#divcalendartable {
-  clear: both;
-}
 
 
 #prevmonthdates {
@@ -181,38 +191,3 @@ th {
   background-color: #E0E0E0;
 }
 
-#currentmonthdates {
-  background-color: #FFFFFF;
-}
-
-#currentmonthhebrewdates {
-    background-color: #FFFFFF;
-  }
-
-#cellvaluespan {
-  background: #FF0000;
-}
-
-#cellvaluelist {
-  background: #FFCC00;
-}        
-
-.swim {
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 80%;
-  text-align: center;
-  background: #445511;
-  color: #F5F5F5;
-  margin-bottom: 5px;
-  padding: 5px;
-}
-
-.chrono {
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 80%;
-  text-align: center;
-  background: #778899;
-  color: #F5F5F5;
-  margin-bottom: 5px;
-  padding: 5px;
-}

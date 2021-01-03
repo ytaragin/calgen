@@ -2,21 +2,24 @@
 let HebCal = require('@hebcal/core');
 let {HebUtils} = require('./gematriya.js');
 let genMonthHtml = require('./htmlbuilder.js');
+let {getEventConfig} = require('./definitions.js');
 
 
 class Day {
-    year;
-    month;
-    date;
+    #year;
+    #month;
+    #date;
     #dateObj;
     #hebDate;
     isActiveMonth;
     birthdays = [];
+    anniversaries = [];
+    yahrtzeits = [];
 
     constructor(year, month, date, activeMonth) {
-      this.year = year;
-      this.month = month;
-      this.date = date;
+      this.#year = year;
+      this.#month = month;
+      this.#date = date;
       this.isActiveMonth = activeMonth;
       this.#hebDate = new HebCal.HDate(date, month, year);
       this.#dateObj = this.#hebDate.greg();
@@ -43,6 +46,10 @@ class Day {
 
     get fullEnglishDate() {
         return this.#dateObj;
+    }
+
+    isSameHebrewDate(month, date) {
+        return (this.#month == month) && (this.#date == date);
     }
 }
 
@@ -71,8 +78,6 @@ let days = [];
         }
 
     }
-    days[3].birthdays.push({name: "ישראל ישראלי"});
-    days[5].birthdays.push({name: "ישראלה ישראלי"});
 
 
     
@@ -101,6 +106,11 @@ function genWeeks(year, month) {
         weeks.push(days);
         currDate = maxDate;
     }   
+
+    weeks[1][3].birthdays.push({name: "ישראל ישראלי"});
+    weeks[2][5].anniversaries.push({names: ["אברהם אבינו", "שרה אימנו" ]});
+    weeks[2][5].anniversaries.push({names: ["יצחק אבינו", "רבקה אימנו" ]});
+
 
     return { weeks, monthConfig };  
 }
@@ -133,33 +143,58 @@ function genMonth(year,month) {
 
  };
 
-function createEvents(year, month) {
+function cityEvents(year, month, city, timeOnly) {
     const options = {
         year: year,
         isHebrewYear: true,
         candlelighting: true,
-        location: HebCal.Location.lookup('Jerusalem'),
+        location: HebCal.Location.lookup(city),
         il: true,
         sedrot: true,
         omer: true,
+        dafyomi: true,
         //locale: 'he',
         month: month,
-      };
-      const events = HebCal.HebrewCalendar.calendar(options);
-      return events;
+    };
+    let events = HebCal.HebrewCalendar.calendar(options);
+
+    if (timeOnly) {
+        events = events.filter(e => getEventConfig(e).timeEvent);
+    }
+
+    events.forEach( e => e.config = getEventConfig(e));
+
+    return events;
+
+} 
+
+function createEvents(year, month) {
+
+    let events = cityEvents(year, month, "Jerusalem", false);
+    events = events.concat(cityEvents(year, month, "Tel Aviv", true));
+    events = events.concat(cityEvents(year, month, "Haifa", true));
+    
+
+    return events;
       
 }
 
-function genCalendar(year, month) {
+function fillIncomingData(data) {
+    data.forEach( d=> {
+        d.month = HebCal.months[d.monthName.toUpperCase()];
+    });
+}
 
+function genCalendar(year, month, familyData) {
 
+    fillIncomingData(familyData);
 
     let events = createEvents(year,month);
 
     let { weeks, monthConfig } = genWeeks(year, month);
 
 
-    let doc = genMonthHtml(monthConfig, weeks, events);
+    let doc = genMonthHtml(monthConfig, weeks, events, familyData);
 
 
 
@@ -181,4 +216,8 @@ function genCalendar(year, month) {
 }
 
 
-genCalendar(5781, 3);
+//genCalendar(5781, 3);
+
+module.exports = {
+    genCalendar
+}

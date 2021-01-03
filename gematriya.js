@@ -46,7 +46,7 @@ class HebUtils {
        // return;
 
         if (options === undefined) {
-            var options = { limit: false, punctuate: true, order: false, geresh: true };
+            var options = { limit: false, punctuate: false, order: false, geresh: false };
         }
     
         if (typeof num !== 'number' && typeof num !== 'string') {
