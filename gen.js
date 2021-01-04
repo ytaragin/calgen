@@ -3,6 +3,7 @@ let HebCal = require('@hebcal/core');
 let {HebUtils} = require('./gematriya.js');
 let genMonthHtml = require('./htmlbuilder.js');
 let {getEventConfig} = require('./definitions.js');
+const fs = require('fs');
 
 
 class Day {
@@ -198,7 +199,9 @@ function genCalendar(year, month, familyData) {
 
 
 
-    console.log(doc);
+    //console.log(doc);
+
+    return(doc);
 
     // let d = new Day(2000, 12, 12, true);
     // console.log(d.constructor);
@@ -215,9 +218,24 @@ function genCalendar(year, month, familyData) {
 
 }
 
+function genYear(year, events) {
+    let monthCount = HebCal.HDate.monthsInYear(year);
+
+    for (let i = 1; i<monthCount; i++) {
+        let html = genCalendar(year, i, events);
+        try {
+            fs.writeFileSync(`calendar_${year}_${i}.html`, html);
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
+}
+
 
 //genCalendar(5781, 3);
 
 module.exports = {
-    genCalendar
+    genCalendar,
+    genYear,
 }

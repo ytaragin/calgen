@@ -18,7 +18,7 @@
 const fs = require('fs');
 const readline = require('readline');
 const {google} = require('googleapis');
-const {genCalendar} = require('./gen')
+const {genCalendar, genYear} = require('./gen')
 
 // If modifying these scopes, delete token.json.
 const SCOPES = ['https://www.googleapis.com/auth/spreadsheets'];
@@ -135,7 +135,8 @@ async function downloaddata(auth) {
         name2: row[4],
       }});
 
-      genCalendar(5781, 3, data);
+      //genCalendar(5781, 3, data);
+      genYear(5782, data )
     } else {
       console.log('No data found.');
     }
