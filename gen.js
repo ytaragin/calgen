@@ -188,7 +188,6 @@ function fillIncomingData(data) {
 
 function genCalendar(year, month, familyData) {
 
-    fillIncomingData(familyData);
 
     let events = createEvents(year,month);
 
@@ -216,10 +215,27 @@ function genCalendar(year, month, familyData) {
     // hu = new HebUtils();
     // console.log(hu.gematriya(15));
 
+
+}
+
+function combineAdars(events) {
+    events.forEach(e => {
+        if(e.month == 13) {
+            e.month = 12;
+        } 
+    })
 }
 
 function genYear(year, events) {
+    fillIncomingData(events);
+
+
     let monthCount = HebCal.HDate.monthsInYear(year);
+
+    if (monthCount < 13 ){
+        combineAdars(events);
+    }
+
 
     for (let i = 1; i<=monthCount; i++) {
         let html = genCalendar(year, i, events);
