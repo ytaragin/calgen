@@ -135,8 +135,16 @@ async function downloaddata(auth) {
         name2: row[4],
       }});
 
+      let myArgs = process.argv.slice(2);
+      let year = 5782;
+      if (myArgs.length >= 1) {
+        year = myArgs[0];
+      }
+
+
+
       //genCalendar(5781, 3, data);
-      genYear(5782, data )
+      genYear(year, data )
     } else {
       console.log('No data found.');
     }
