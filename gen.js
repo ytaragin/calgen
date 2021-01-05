@@ -221,7 +221,7 @@ function genCalendar(year, month, familyData) {
 function genYear(year, events) {
     let monthCount = HebCal.HDate.monthsInYear(year);
 
-    for (let i = 1; i<monthCount; i++) {
+    for (let i = 1; i<=monthCount; i++) {
         let html = genCalendar(year, i, events);
         try {
             fs.writeFileSync(`calendar_${year}_${i}.html`, html);
