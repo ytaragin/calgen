@@ -1,8 +1,9 @@
-let { DaysOfWeek, Months, getEventConfig } = require('./definitions.js');
+let { DaysOfWeek, Months, getEventConfig, IMGDIRS } = require('./definitions.js');
 let HebCal = require('@hebcal/core');
 let { HebUtils } = require('./gematriya.js');
 let _ = require('lodash');
 const { isElement, divide } = require('lodash');
+const { lstat } = require('fs-extra');
 
 
 function startHTML() {
@@ -25,6 +26,14 @@ function endHTML() {
     `;
 }
 
+function addImageToList(imageLists, category, image) {
+    if (! (category in imageLists)) {
+        imageLists[category] = [];
+    }
+
+    imageLists[category].push(image);
+}
+
 
 function genDayRow(daysOfWeek) {
     // Write the header of the days of the week
@@ -33,7 +42,7 @@ function genDayRow(daysOfWeek) {
         html += `<th class="daysheader">${d}</th>`;
     });
 
-    html += '</tr>';
+    html += '</tr>\n';
 
     return html;
 }
@@ -46,28 +55,33 @@ function getEventGroup(events, itemClass, groupClass, attrFilter) {
             `)
         .join('');
 
-    return `<div class="${groupClass}">${items}</div>`;
+    return `<div class="${groupClass}">${items}</div>\n`;
 
 }
 
 function genYahrzeitHTML(y) {
-    return `<img class="yahrzeit-img"  src="candle.png"><span class="yahrzeit-name">${y.name1}</span>`;
+    return `<img class="yahrzeit-img"  src="imgs/candle.png"><span class="yahrzeit-name">${y.name1}</span>`;
 }
 
 function genBirthdayHTML(b) {
-    return `<img class="birthday-img"  src="birthday.png"><span class="birthday-name">${b.name1}</span>`;
+    return `<img class="birthday-img"  src="imgs/birthday.png"><span class="birthday-name">${b.name1}</span>`;
 }
 
 function genAnnivHTML(a) {
-    return `<div class="anniv-img"><img class="anniv-img"  src="balloon.jpg"></div>
+    return `<div class="anniv-img"><img class="anniv-img"  src="imgs/balloon.jpg"></div>
             <div class="anniv-name"><div>${a.name1}</div><div>ו${a.name2}</div></div>`;
 }
 
 function genGroupHTML(items, itemClass, groupClass, transform, type) {
     let itemTypes = items.filter (i => i.type === type);
+
+    if (itemTypes.length == 0){
+        return "";
+    }
+
     let html = `<div class="${groupClass}">`;
     html += itemTypes.map(i => `<div class="${itemClass}">${transform(i)}</div>`).join('');
-    html += '</div>'
+    html += '</div>\n'
 
     return html;
 }
@@ -81,9 +95,32 @@ function genClassList(events) {
     return classes;
 }
 
+function genEventPlaceholders(events, imageLists) {
+        let html = "";
 
+        let filtered = events.filter(e => e.config.genPlaceHolder);
+        if (filtered.length == 0) {
+            return html;
+        }
 
-function genDayHTML(day, events, familyData) {
+    //    let filename = 
+
+        filtered.forEach(e => {
+            let name = e.desc.split('(')[0].trim();
+            name = name.replace(/:/g, '');
+
+            let imgfile = `${IMGDIRS.EVENTS}/${name}.png`;
+            html += `<div class="event-img-block"><img class="event-img" src="${imgfile}"></div>\n`;
+            addImageToList(imageLists,IMGDIRS.EVENTS, imgfile);
+        });
+
+    
+        return `<div class="event-placeholders">${html}</div>\n`;
+    
+
+}
+
+function genDayHTML(day, events, familyData, imageLists) {
 
 
     let html = `
@@ -96,7 +133,9 @@ function genDayHTML(day, events, familyData) {
         "day-title-group",
         e => e.inTitle)}
     <div class="eng-date">${day.englishDate}</div>
-</div>`;
+</div>
+<div class="main-body">
+`;
     //html += getDayTitle(events);
 
     html += genGroupHTML(familyData, "birthday",
@@ -108,22 +147,18 @@ function genDayHTML(day, events, familyData) {
     html += genGroupHTML(familyData, "yahrzeit",
         "yahrzeit-group", genYahrzeitHTML, "Yahrzeit");
 
+    html += genEventPlaceholders(events, imageLists);
 
+//<div class="event-img-block"><img class="event-img" src="othermonths/AvPre1.png"></div>
+
+    html += "</div>\n";
     html += '<div class="footer-row ">';
     html += getEventGroup(events, "footer-item", "footer-group",
         e => e.inFooter);
     html += getEventGroup(events, "time-item", "time-group",
         e => e.timeEvent);
-    html += '</div>';
+    html += '</div>\n';
 
-
-
-
-    /*    
-    events.forEach(e => {
-        html += `<div class="event">${e.render('he')}</div>`
-    });
-    */
     html += `        
     </div></td>
 
@@ -132,26 +167,42 @@ function genDayHTML(day, events, familyData) {
     return html;
 }
 
+function genOtherMonthDay(day, label, counter, imageLists) {
+    let html = '<td class="othermonthdate">' 
+    
+    let imgfile = `${IMGDIRS.OTHERMONTHS}/${day.primaryMonthInEnglish}${label}${counter}.png`;
 
-function genWeekHTML(days, events, familyData) {
+    html += `<div class="othermonthimg"><img class="fillerimg" src="${imgfile}"></div>\n`
+
+    addImageToList(imageLists,IMGDIRS.OTHERMONTHS, imgfile);
+
+    html+= '</td>\n';
+
+    return html;
+}
+
+
+function genWeekHTML(days, events, familyData, imageLists) {
     let html = "<tr>";
+
+    let label = "Pre";
+    let counter = 1;
 
     days.forEach(d => {
         if (d.isActiveMonth) {
             let daysEvents = events.filter(e => d.fullHebrewDate.isSameDate(e.date));
             let daysFamily = familyData.filter(f => d.isSameHebrewDate(f.month, f.date))
-            html += genDayHTML(d, daysEvents, daysFamily);
+            html += genDayHTML(d, daysEvents, daysFamily, imageLists);
+            // if we have a real date then any later blank days will be post days
+            label = "Post";
         }
         else {
 
-            html += '<td id="prevmonthdates">' +
-                // '<span id="cellvaluespan">' + (d.date) + '</span><br/>' +
-                // '<ul id="cellvaluelist"><li>apples</li><li>bananas</li><li>pineapples</li></ul>' +
-                '</td>';
+            html += genOtherMonthDay(d, label, counter++, imageLists);
         }
     })
 
-    html += '</tr>';
+    html += '</tr>\n';
 
     return html;
 }
@@ -177,15 +228,32 @@ function genTitleHTML(cfg) {
 
     
     let name = months.heb_hebrew.substring(months.heb_hebrew.indexOf(' '));
-
-    html += `${name}`
-    html+= ` (${months.eng_year} ${eng}) `
+        html+='<div class="month_header_hebrew">';
+        html += `${name}`;
+        html += `</div>`;
+        html+='<div class="month_header_english">';
+        html+= `${months.eng_year} ${eng}`
+        html += `</div>`;
     html += `</div>`;
 
     return html;
 }
 
-function genMonthHtml(cfg, weeks, events, familyData) {
+function getNumberOfExtraDays(weeks) {
+    let count = 0
+    weeks.forEach(days=> {
+        days.forEach(day=>{
+            if (!d.isActiveMonth) {
+                count++;
+            }
+        })
+    });
+
+    return count;
+}
+
+
+function genMonthHtml(cfg, weeks, events, familyData, extraImageFiles) {
 
 
     let h = startHTML();
@@ -197,13 +265,12 @@ function genMonthHtml(cfg, weeks, events, familyData) {
 
 
 
-
     let html = '<table class="calendar">';
-    html += `<tr><td colspan="7">${genTitleHTML(cfg)}</td></tr>`;
+    html += `<tr><td colspan="7">${genTitleHTML(cfg)}</td></tr>\n`;
 
     html += genDayRow(DaysOfWeek);
     weeks.forEach(days => {
-        html += genWeekHTML(days, events, familyData);
+        html += genWeekHTML(days, events, familyData, extraImageFiles);
     });
 
     // Closes table

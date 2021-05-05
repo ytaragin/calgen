@@ -2,8 +2,9 @@
 let HebCal = require('@hebcal/core');
 let {HebUtils} = require('./gematriya.js');
 let genMonthHtml = require('./htmlbuilder.js');
-let {getEventConfig} = require('./definitions.js');
-const fs = require('fs');
+let {getEventConfig, HebMonthsEnglishName, IMGDIRS} = require('./definitions.js');
+const fse = require('fs-extra')
+
 
 
 class Day {
@@ -12,22 +13,26 @@ class Day {
     #date;
     #dateObj;
     #hebDate;
-    isActiveMonth;
+    #primaryMonth;
+    //isActiveMonth;
     birthdays = [];
     anniversaries = [];
     yahrtzeits = [];
 
-    constructor(year, month, date, activeMonth) {
+    constructor(year, month, date, primaryMonth) {
       this.#year = year;
       this.#month = month;
       this.#date = date;
-      this.isActiveMonth = activeMonth;
+      this.#primaryMonth = primaryMonth;
       this.#hebDate = new HebCal.HDate(date, month, year);
-      this.#dateObj = this.#hebDate.greg();
-
-      
+      this.#dateObj = this.#hebDate.greg();    
 
     }
+
+    get isActiveMonth() {
+        return (this.#month == this.#primaryMonth);
+    }
+
     get englishDate() {
         return this.#dateObj.getDate();
     }
@@ -40,6 +45,15 @@ class Day {
         let hu = new HebUtils();
         return hu.gematriya(this.#hebDate.getDate());
     }
+
+    get hebrewMonthInEnglish() {
+        return HebMonthsEnglishName[this.#month-1];
+    }
+
+    get primaryMonthInEnglish() {
+        return HebMonthsEnglishName[this.#primaryMonth-1];
+    }
+
 
     get fullHebrewDate() {
         return this.#hebDate;
@@ -66,16 +80,16 @@ let days = [];
 
     for (let i=0; i<firstDayOfCurrentWeek; i++) {
         days.push(new Day(monthConfig.prevYear, monthConfig.prevMonth, 
-                          monthConfig.daysInPrev - (firstDayOfCurrentWeek-i-1), false));
+                          monthConfig.daysInPrev - (firstDayOfCurrentWeek-i-1), monthConfig.month));
     } 
 
     let currDate = firstDate;
     let overFlow = 1;
     while (days.length < 7)  {
         if (currDate <= monthConfig.daysInMonth) {
-            days.push( new Day(monthConfig.year, monthConfig.month, currDate++, true));
+            days.push( new Day(monthConfig.year, monthConfig.month, currDate++, monthConfig.month));
         } else {
-            days.push(new Day(monthConfig.year, monthConfig.month+1,overFlow++, false) );
+            days.push(new Day(monthConfig.year, monthConfig.month+1,overFlow++, monthConfig.month) );
         }
 
     }
@@ -107,11 +121,11 @@ function genWeeks(year, month) {
         weeks.push(days);
         currDate = maxDate;
     }   
-
+/*
     weeks[1][3].birthdays.push({name: "ישראל ישראלי"});
     weeks[2][5].anniversaries.push({names: ["אברהם אבינו", "שרה אימנו" ]});
     weeks[2][5].anniversaries.push({names: ["יצחק אבינו", "רבקה אימנו" ]});
-
+*/
 
     return { weeks, monthConfig };  
 }
@@ -139,6 +153,7 @@ function genMonth(year,month) {
     let lastDateOfCurrentMonth = new Date(y, m+1, 0).getDate();
 
     let events = createEvents(year,month);
+
 
     genMonthHtml(year, month)
 
@@ -186,15 +201,29 @@ function fillIncomingData(data) {
     });
 }
 
-function genCalendar(year, month, familyData) {
+async function createExtraImageFiles(extraImageFiles, outputDir) {
+    for (key in extraImageFiles) {
+        await fse.ensureDir(`${outputDir}/${key}`);
+        extraImageFiles[key].forEach (async f => {
+            await fse.copy(`${outputDir}/${IMGDIRS.IMGS}/1x1.png`, `${outputDir}/${f}`);
+        });
+    }
+}
+
+function genCalendar(year, month, familyData, extraImageFiles) {
 
 
     let events = createEvents(year,month);
 
+
+
     let { weeks, monthConfig } = genWeeks(year, month);
 
 
-    let doc = genMonthHtml(monthConfig, weeks, events, familyData);
+    let doc = genMonthHtml(monthConfig, weeks, events, familyData, extraImageFiles);
+
+     
+
 
 
 
@@ -226,8 +255,15 @@ function combineAdars(events) {
     })
 }
 
-function genYear(year, events) {
+async function genYear(year, events) {
     fillIncomingData(events);
+
+
+    let outputDir = year.toString();
+
+    await fse.copy("template", outputDir);
+    let extraImageFiles = {};
+
 
 
     let monthCount = HebCal.HDate.monthsInYear(year);
@@ -238,13 +274,15 @@ function genYear(year, events) {
 
 
     for (let i = 1; i<=monthCount; i++) {
-        let html = genCalendar(year, i, events);
+        let html = genCalendar(year, i, events, extraImageFiles);
         try {
-            fs.writeFileSync(`calendar_${year}_${i}.html`, html);
+            fse.writeFileSync(`${outputDir}/calendar_${year}_${i}.html`, html);
         } catch (err) {
             console.error(err);
         }
     }
+
+    createExtraImageFiles(extraImageFiles, outputDir)
 
 }
 

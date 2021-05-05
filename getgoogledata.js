@@ -142,9 +142,14 @@ async function downloaddata(auth) {
       }
 
 
+      try {
+        fs.writeFileSync('last_data.txt', JSON.stringify(data));
+        //file written successfully
+      } catch (err) {
+        console.error(err)
+      }
 
       //genCalendar(5781, 3, data);
-      genYear(year, data )
     } else {
       console.log('No data found.');
     }
