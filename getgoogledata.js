@@ -149,7 +149,7 @@ async function downloaddata(auth) {
         console.error(err)
       }
 
-      //genCalendar(5781, 3, data);
+      genYear(year, data);
     } else {
       console.log('No data found.');
     }

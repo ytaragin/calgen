@@ -210,11 +210,19 @@ async function createExtraImageFiles(extraImageFiles, outputDir) {
     }
 }
 
+let alle = [];
+
 function genCalendar(year, month, familyData, extraImageFiles) {
 
 
     let events = createEvents(year,month);
 
+    events.filter(e => e instanceof HebCal.HolidayEvent).forEach(e => {
+        alle.push({
+            desc: e.desc,
+            mask: e.mask
+        });
+    });
 
 
     let { weeks, monthConfig } = genWeeks(year, month);
@@ -281,6 +289,13 @@ async function genYear(year, events) {
             console.error(err);
         }
     }
+
+
+
+
+    let str = JSON.stringify(alle);
+    fse.writeFileSync(`holidayevents.json`, str);
+
 
     createExtraImageFiles(extraImageFiles, outputDir)
 
