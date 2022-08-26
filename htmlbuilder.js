@@ -27,7 +27,7 @@ function endHTML() {
 }
 
 function addImageToList(imageLists, category, image) {
-    if (! (category in imageLists)) {
+    if (!(category in imageLists)) {
         imageLists[category] = [];
     }
 
@@ -73,9 +73,9 @@ function genAnnivHTML(a) {
 }
 
 function genGroupHTML(items, itemClass, groupClass, transform, type) {
-    let itemTypes = items.filter (i => i.type === type);
+    let itemTypes = items.filter(i => i.type === type);
 
-    if (itemTypes.length == 0){
+    if (itemTypes.length == 0) {
         return "";
     }
 
@@ -87,7 +87,9 @@ function genGroupHTML(items, itemClass, groupClass, transform, type) {
 }
 
 function genClassList(events) {
-    let classes = _.uniq(events.map(e => e.config.dayClass)).join(" ");
+    let classList = _.sortBy(events, "dayClassPriority").reverse().map(e => e.config.dayClass);
+    //    let classes = _.uniq(events.map(e => e.config.dayClass)).join(" ");
+    let classes = _.uniq(classList).join(" ");
     if (classes === "") {
         classes = "plain-day"
     }
@@ -96,32 +98,36 @@ function genClassList(events) {
 }
 
 function genEventPlaceholders(events, imageLists) {
-        let html = "";
+    let html = "";
 
-        let filtered = events.filter(e => e.config.genPlaceHolder);
-        if (filtered.length == 0) {
-            return html;
-        }
+    let filtered = events.filter(e => e.config.genPlaceHolder);
+    if (filtered.length == 0) {
+        return html;
+    }
 
     //    let filename = 
 
-        filtered.forEach(e => {
-            let name = e.desc.split('(')[0].trim();
-            name = name.replace(/:/g, '');
+    filtered.forEach(e => {
+        let name = e.desc.split('(')[0].trim();
+        name = name.replace(/:/g, '');
 
-            let imgfile = `${IMGDIRS.EVENTS}/${name}.png`;
-            html += `<div class="event-img-block"><img class="event-img" src="${imgfile}"></div>\n`;
-            addImageToList(imageLists,IMGDIRS.EVENTS, imgfile);
-        });
+        let imgfile = `${IMGDIRS.EVENTS}/${name}.png`;
+        html += `<div class="event-img-block"><img class="event-img" src="${imgfile}"></div>\n`;
+        addImageToList(imageLists, IMGDIRS.EVENTS, imgfile);
+    });
 
-    
-        return `<div class="event-placeholders">${html}</div>\n`;
-    
+
+    return `<div class="event-placeholders">${html}</div>\n`;
+
 
 }
 
 function genDayHTML(day, events, familyData, imageLists) {
 
+    let engDateStyle = "eng-date"
+    if (day.englishDate == 1) {
+        engDateStyle += " eng-date-one"
+    }
 
     let html = `
 <td class="day-td ${genClassList(events)}"><div class="day-cell">
@@ -132,7 +138,7 @@ function genDayHTML(day, events, familyData, imageLists) {
         "day-title",
         "day-title-group",
         e => e.inTitle)}
-    <div class="eng-date">${day.englishDate}</div>
+    <div class="${engDateStyle}">${day.englishDate}</div>
 </div>
 <div class="main-body">
 `;
@@ -149,7 +155,7 @@ function genDayHTML(day, events, familyData, imageLists) {
 
     html += genEventPlaceholders(events, imageLists);
 
-//<div class="event-img-block"><img class="event-img" src="othermonths/AvPre1.png"></div>
+    //<div class="event-img-block"><img class="event-img" src="othermonths/AvPre1.png"></div>
 
     html += "</div>\n";
     html += '<div class="footer-row ">';
@@ -168,15 +174,15 @@ function genDayHTML(day, events, familyData, imageLists) {
 }
 
 function genOtherMonthDay(day, label, counter, imageLists) {
-    let html = '<td class="othermonthdate">' 
-    
+    let html = '<td class="othermonthdate">'
+
     let imgfile = `${IMGDIRS.OTHERMONTHS}/${day.primaryMonthInEnglish}${label}${counter}.png`;
 
     html += `<div class="othermonthimg"><img class="fillerimg" src="${imgfile}"></div>\n`
 
-    addImageToList(imageLists,IMGDIRS.OTHERMONTHS, imgfile);
+    addImageToList(imageLists, IMGDIRS.OTHERMONTHS, imgfile);
 
-    html+= '</td>\n';
+    html += '</td>\n';
 
     return html;
 }
@@ -226,14 +232,14 @@ function genTitleHTML(cfg) {
     let eng = months.eng.map(m => Months[m]).join('-');
     let html = `<div class="month_header">`;
 
-    
+
     let name = months.heb_hebrew.substring(months.heb_hebrew.indexOf(' '));
-        html+='<div class="month_header_hebrew">';
-        html += `${name}`;
-        html += `</div>`;
-        html+='<div class="month_header_english">';
-        html+= `${months.eng_year} ${eng}`
-        html += `</div>`;
+    html += '<div class="month_header_hebrew">';
+    html += `${name}`;
+    html += `</div>`;
+    html += '<div class="month_header_english">';
+    html += `${months.eng_year} ${eng}`
+    html += `</div>`;
     html += `</div>`;
 
     return html;
@@ -241,8 +247,8 @@ function genTitleHTML(cfg) {
 
 function getNumberOfExtraDays(weeks) {
     let count = 0
-    weeks.forEach(days=> {
-        days.forEach(day=>{
+    weeks.forEach(days => {
+        days.forEach(day => {
             if (!d.isActiveMonth) {
                 count++;
             }

@@ -17,8 +17,8 @@
 // [START sheets_quickstart]
 const fs = require('fs');
 const readline = require('readline');
-const {google} = require('googleapis');
-const {genCalendar, genYear} = require('./gen')
+const { google } = require('googleapis');
+const { genCalendar, genYear } = require('./gen')
 
 // If modifying these scopes, delete token.json.
 const SCOPES = ['https://www.googleapis.com/auth/spreadsheets'];
@@ -41,9 +41,9 @@ fs.readFile('credentials.json', (err, content) => {
  * @param {function} callback The callback to call with the authorized client.
  */
 function authorize(credentials, callback) {
-  const {client_secret, client_id, redirect_uris} = credentials.installed;
+  const { client_secret, client_id, redirect_uris } = credentials.installed;
   const oAuth2Client = new google.auth.OAuth2(
-      client_id, client_secret, redirect_uris[0]);
+    client_id, client_secret, redirect_uris[0]);
 
   // Check if we have previously stored a token.
   fs.readFile(TOKEN_PATH, (err, token) => {
@@ -90,7 +90,7 @@ function getNewToken(oAuth2Client, callback) {
  * @param {google.auth.OAuth2} auth The authenticated Google OAuth client.
  */
 function listMajors(auth) {
-  const sheets = google.sheets({version: 'v4', auth});
+  const sheets = google.sheets({ version: 'v4', auth });
   sheets.spreadsheets.values.get({
     spreadsheetId: '1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms',
     range: 'Class Data!A2:E',
@@ -112,7 +112,7 @@ function listMajors(auth) {
 
 
 async function downloaddata(auth) {
-    const sheets = google.sheets({version: 'v4', auth});
+  const sheets = google.sheets({ version: 'v4', auth });
   sheets.spreadsheets.values.get({
     spreadsheetId: '15VLso_uBt51KkgtXY8TonFEgh4YkElXoFCTwek51GFI',
     range: 'Data!A2:E',
@@ -120,23 +120,24 @@ async function downloaddata(auth) {
     if (err) return console.log('The API returned an error: ' + err);
     const rows = res.data.values;
     if (rows.length) {
-//      console.log('Col1, Col4:');
+      //      console.log('Col1, Col4:');
       // Print columns A and E, which correspond to indices 0 and 4.
-    //   rows.forEach((row) => {
-    //     console.log(`${row[0]}, ${row[3]}`);
-    //   });
+      //   rows.forEach((row) => {
+      //     console.log(`${row[0]}, ${row[3]}`);
+      //   });
 
       let data = rows.map(row => {
         return {
-        monthName:row[0],
-        date:row[1],
-        type:row[2], 
-        name1: row[3],
-        name2: row[4],
-      }});
+          monthName: row[0],
+          date: row[1],
+          type: row[2],
+          name1: row[3],
+          name2: row[4],
+        }
+      });
 
       let myArgs = process.argv.slice(2);
-      let year = 5782;
+      let year = 5783;
       if (myArgs.length >= 1) {
         year = myArgs[0];
       }

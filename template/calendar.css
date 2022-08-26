@@ -1,4 +1,8 @@
-html, body { margin: 0; padding: 0; }
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
 
 table {
   border-collapse: collapse;
@@ -17,20 +21,20 @@ th {
 * Overall Stuff
 ***************/
 
-.month_header { 
-  direction: rtl; 
+.month_header {
+  direction: rtl;
   background: slateblue;
-  font-weight: bold; 
+  font-weight: bold;
   font-style: italic;
   padding-bottom: 4px;
 
   display: flex;
-  justify-content:center ;
+  justify-content: center;
   align-items: center;
 }
 
 .month_header_hebrew {
-  font-size: 60px; 
+  font-size: 60px;
   vertical-align: middle;
   height: 100%;
   padding-left: 30px;
@@ -38,13 +42,13 @@ th {
 }
 
 .month_header_english {
-  font-size: 40px; 
+  font-size: 40px;
   vertical-align: bottom;
 }
 
 
 .calendar {
-  direction: rtl;
+  direction: ltr;
 }
 
 .daysheader {
@@ -64,7 +68,8 @@ Day Layout
 /**
 * Sizing of cells
 **/
-.othermonthdate, .day-cell {
+.othermonthdate,
+.day-cell {
   height: 150px;
   width: 150px;
 
@@ -75,8 +80,20 @@ Day Layout
 
   display: flex;
   flex-direction: column;
-  justify-content:space-between;
+  justify-content: space-between;
 }
+
+/*******************
+* Special day colorings
+* The order of these entries matter.
+* Which ever is last, has highest priority
+***********************/
+
+.plain-day,
+.minorday {
+  background-color: antiquewhite;
+}
+
 
 .shabbat {
   background-color: lightblue;
@@ -86,20 +103,17 @@ Day Layout
   background-color: cornflowerblue;
 }
 
-.plain-day, .minorday {
-  background-color: antiquewhite;
-}
 
 
 .othermonthdate {
   background-color: #E0E0E0;
   text-align: center;
-  
+
 }
 
 .fillerimg {
-    max-width: 80%;
-    max-height: 140px;
+  max-width: 80%;
+  max-height: 140px;
 }
 
 
@@ -117,11 +131,9 @@ Title Section
 *********************************/
 
 
-.day-title-group {
+.day-title-group {}
 
-}
-
-.day-title{
+.day-title {
   font-weight: bold;
   text-align: center;
 
@@ -129,13 +141,13 @@ Title Section
 
 .title-row {
   display: flex;
-  justify-content:space-between;
+  justify-content: space-between;
   direction: rtl;
 }
 
 .heb-date {
   float: left;
-  
+
   border: none;
 }
 
@@ -143,17 +155,30 @@ Title Section
   float: left;
 }
 
-
+.eng-date-one {
+  font-weight: bold;
+  border-radius: 25%;
+  xxxwidth: 34px;
+  xxxheight: 34px;
+  padding: 1px;
+  background: #fff;
+  border: 3px solid #000;
+  color: #000;
+  text-align: center;
+  xxxfont: 32px Arial, sans-serif;
+}
 
 
 .birthday {
   text-align: center;
   vertical-align: middle;
   background-color: goldenrod;
-};
+}
+
+;
 
 .birthday-name {
-  font-size:100%; 
+  font-size: 100%;
   font-weight: bold;
 }
 
@@ -165,11 +190,13 @@ Title Section
 .yahrzeit {
   text-align: center;
   vertical-align: middle;
-  background-color:darkgrey;
-};
+  background-color: darkgrey;
+}
+
+;
 
 .yahrzeit-name {
-  font-size:100%; 
+  font-size: 100%;
   font-weight: bold;
 }
 
@@ -180,7 +207,7 @@ Title Section
 
 .anniv {
   display: flex;
-  justify-content:center;
+  justify-content: center;
   background-color: coral;
   align-items: center;
 }
@@ -197,19 +224,19 @@ Title Section
 
 .footer-row {
   display: flex;
-  justify-content:space-between;
+  justify-content: space-between;
 }
 
 .time-item {
   xcolor: #FF0000;
 }
+
 .time-group {
-  text-align:left;
+  text-align: left;
 }
 
-.footer-item {
+.footer-item {}
 
-}
 .footer-group {
   display: flex;
   flex-direction: column;
@@ -221,12 +248,6 @@ Title Section
 
 .divcalendar {
   padding: 15px;
-    float:left;
-    /*background-color: #FFCC00;*/
+  float: left;
+  /*background-color: #FFCC00;*/
 }
-
-
-
-
-
-
