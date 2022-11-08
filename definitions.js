@@ -62,7 +62,8 @@ const getEventConfig = (event) => {
         config.getDisplay = e => e.eventTimeStr;
     } else if (event instanceof HebCal.RoshChodeshEvent) {
         config.inTitle = true;
-        config.dayClass = "roshchodesh"
+        config.dayClass = "roshchodesh";
+        config.genPlaceHolder = true;
         dayClassPriority = 5;
     } else if (event instanceof HebCal.HolidayEvent) {
         config.inTitle = true;

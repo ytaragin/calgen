@@ -91,16 +91,19 @@ Day Layout
 
 .plain-day,
 .minorday {
-  background-color: antiquewhite;
+  background-color: Gainsboro;
 }
 
+.roshchodesh {
+  background-color: LightSteelBlue;
+}
 
 .shabbat {
-  background-color: lightblue;
+  background-color: CornflowerBlue;
 }
 
 .holiday {
-  background-color: cornflowerblue;
+  background-color: RoyalBlue;
 }
 
 
@@ -172,7 +175,7 @@ Title Section
 .birthday {
   text-align: center;
   vertical-align: middle;
-  background-color: goldenrod;
+  background-color: LightGreen;
 }
 
 ;
@@ -208,7 +211,7 @@ Title Section
 .anniv {
   display: flex;
   justify-content: center;
-  background-color: coral;
+  background-color: MediumSlateBlue;
   align-items: center;
 }
 

@@ -216,6 +216,7 @@ function genCalendar(year, month, familyData, extraImageFiles) {
 
 
     let events = createEvents(year,month);
+    
 
     events.filter(e => e instanceof HebCal.HolidayEvent).forEach(e => {
         alle.push({
