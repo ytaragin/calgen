@@ -124,13 +124,15 @@ function genEventPlaceholders(events, imageLists) {
 
 function genDayHTML(day, events, familyData, imageLists) {
 
+    let dayClass = "day-td"
     let engDateStyle = "eng-date"
     if (day.englishDate == 1) {
-        engDateStyle += " eng-date-one"
+        engDateStyle += " eng-date-one-number"
+        dayClass += " eng-date-one-background"
     }
 
     let html = `
-<td class="day-td ${genClassList(events)}"><div class="day-cell">
+<td class="${dayClass}" ><div class="${genClassList(events)} day-cell">
 
 <div class="title-row ">
     <div class="heb-date">${day.hebrewDate} </div> 
