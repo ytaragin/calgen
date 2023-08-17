@@ -41,6 +41,9 @@ function getHolidayClass(e) {
     if (HolidayTypes.Major.includes(e.desc)) {
         return "holiday"
     }
+    if (HolidayTypes.Major.filter(ht => e.desc.startsWith(ht)).length > 0) {
+        return "holiday"
+    }
     return "minorday"
 
 }
@@ -164,14 +167,7 @@ const HolidayTypes = {
         "Chanukah: 7 Candles",
         "Chanukah: 8 Candles",
         "Chanukah: 8th Day",
-        "Pesach I",
-        "Pesach II (CH''M)",
-        "Pesach III (CH''M)",
-        "Pesach IV (CH''M)",
-        "Pesach Sheni",
-        "Pesach V (CH''M)",
-        "Pesach VI (CH''M)",
-        "Pesach VII",
+        "Pesach",
         "Purim",
         "Rosh Chodesh Adar",
         "Rosh Chodesh Adar I",
@@ -186,19 +182,12 @@ const HolidayTypes = {
         "Rosh Chodesh Sivan",
         "Rosh Chodesh Tamuz",
         "Rosh Chodesh Tevet",
-        "Rosh Hashana 5782",
-        "Rosh Hashana 5783",
-        "Rosh Hashana II",
+        "Rosh Hashana",
+
         "Shavuot",
         "Shmini Atzeret",
         "Shushan Purim",
-        "Sukkot I",
-        "Sukkot II (CH''M)",
-        "Sukkot III (CH''M)",
-        "Sukkot IV (CH''M)",
-        "Sukkot V (CH''M)",
-        "Sukkot VI (CH''M)",
-        "Sukkot VII (Hoshana Raba)",
+        "Sukkot",
         "Yom HaAtzma'ut",
         "Yom Kippur",
         "Yom Yerushalayim"
