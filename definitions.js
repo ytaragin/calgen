@@ -41,6 +41,9 @@ function getHolidayClass(e) {
     if (HolidayTypes.Major.includes(e.desc)) {
         return "holiday"
     }
+    if (HolidayTypes.Minor.includes(e.desc)) {
+        return "minorday"
+    }
     if (HolidayTypes.Major.filter(ht => e.desc.startsWith(ht)).length > 0) {
         return "holiday"
     }
@@ -136,6 +139,7 @@ const HolidayTypes = {
         "Erev Yom Kippur",
         "Leil Selichot",
         "Lag BaOmer",
+        "Pesach Sheni",
         "Purim Katan",
         "Shabbat Chazon",
         "Shabbat HaChodesh",

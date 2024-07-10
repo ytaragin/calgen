@@ -1,12 +1,12 @@
-const {genCalendar, genYear} = require('./gen')
+const { genCalendar, genYear } = require('./gen')
 const fs = require('fs');
 
 
 function gen_local(year) {
 
-    let data = []
+  let data = []
 
-try {
+  try {
     let datastr = fs.readFileSync('last_data.txt');
 
     data = JSON.parse(datastr);
@@ -16,9 +16,9 @@ try {
 
   }
 
-  genYear(year, data )
+  genYear(year, data)
 
 }
 
-gen_local(5783);
+gen_local(5784);
 
