@@ -90,6 +90,12 @@ const getEventConfig = (event) => {
     } else if (event instanceof HebCal.DafYomiEvent) {
         config.inFooter = true;
         config.getDisplay = e => e.render(LANG).split(':')[1].trim();
+    } else if (event.myevent !== undefined) {
+        config.inTitle = true;
+        //        config.dayClass = "holiday";
+        config.dayClass = "minorday";
+        dayClassPriority = 3;
+        config.genPlaceHolder = true;
     }
     /*
     else if (event instanceof HebCal.OmerEvent) {
