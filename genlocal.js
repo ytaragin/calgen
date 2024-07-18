@@ -4,21 +4,21 @@ const fs = require('fs');
 
 function gen_local(year) {
 
-  let data = []
+    let data = []
 
-  try {
-    let datastr = fs.readFileSync('last_data.txt');
+    try {
+        let datastr = fs.readFileSync('last_data.txt');
 
-    data = JSON.parse(datastr);
+        data = JSON.parse(datastr);
 
-  } catch (err) {
-    console.error(err)
+    } catch (err) {
+        console.error(err)
 
-  }
+    }
 
-  genYear(year, data)
+    genYear(year, data)
 
 }
 
-gen_local(5784);
+gen_local(5785);
 
