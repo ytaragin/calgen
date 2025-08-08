@@ -244,9 +244,10 @@ function genCalendar(year, month, familyData, extraImageFiles) {
     let events = createEvents(year, month);
 
     events = events.concat([
-        new MyEvent(new HebCal.HDate(11, 8, 5785), "Rachel Imeinu", "Rachel Imeinu", "יום פטירת רחל אמנו"),
-        new MyEvent(new HebCal.HDate(new Date(2024, 9, 27)), "Winter Time", "Winter Time", "זמן חורף"),
-        new MyEvent(new HebCal.HDate(new Date(2025, 2, 28)), "Summer Time", "Summer Time", "זמן קיץ"),
+        new MyEvent(new HebCal.HDate(11, 8, year), "Rachel Imeinu", "Rachel Imeinu", "פטירת רחל אמנו"),
+        //new MyEvent(new HebCal.HDate(11, 8, 5785), "Rachel Imeinu", "Rachel Imeinu", "פטירת רחל אמנו"),
+        new MyEvent(new HebCal.HDate(new Date(2024, 9, 27)), "Winter Time", "Winter Time", "שעון חורף"),
+        new MyEvent(new HebCal.HDate(new Date(2025, 2, 28)), "Summer Time", "Summer Time", "שעון קיץ"),
     ]);
 
     let d = new HebCal.HDate(new Date(2025, 2, 28))
