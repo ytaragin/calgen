@@ -1,9 +1,13 @@
 //let {HebrewCalendar, HDate, Location, Event} = require('@hebcal/core');
-let HebCal = require('@hebcal/core');
-let { HebUtils } = require('./gematriya.js');
-let genMonthHtml = require('./htmlbuilder.js');
-let { getEventConfig, HebMonthsEnglishName, IMGDIRS } = require('./definitions.js');
-const fse = require('fs-extra')
+import HebCal from '@hebcal/core';
+import { HebUtils } from './gematriya.js';
+import genMonthHtml from './htmlbuilder.js';
+import { getEventConfig, HebMonthsEnglishName, IMGDIRS } from './definitions.js';
+import { MyEvent } from './myevent.js';
+import { getClockChangeEvents } from './clockchanges.js';
+import fse from 'fs-extra';
+import ical from 'ical-generator';
+
 
 
 
@@ -202,7 +206,7 @@ function fillIncomingData(data) {
 }
 
 async function createExtraImageFiles(extraImageFiles, outputDir) {
-    for (key in extraImageFiles) {
+    for (let key in extraImageFiles) {
         await fse.ensureDir(`${outputDir}/${key}`);
         extraImageFiles[key].forEach(async f => {
             await fse.copy(`${outputDir}/${IMGDIRS.IMGS}/1x1.png`, `${outputDir}/${f}`);
@@ -211,34 +215,16 @@ async function createExtraImageFiles(extraImageFiles, outputDir) {
 }
 
 
-class MyEvent {
-    constructor(date, desc, basename, hebrewname) {
-        this.date = date;
-        this.desc = desc;
-        this.basename = basename;
-        this.hebrewname = hebrewname;
-        this.myevent = "myevent";
-    }
-
-    basename() {
-        return this.getDesc();
-    }
-    getDesc() {
-        return this.desc;
-    }
-    getDate() {
-        return this.date;  //HDate
-    }
-    render(locale) {
-        return this.hebrewname;
-        //return Locale.gettext(this.desc, locale);
-    }
-}
-
 
 let alle = [];
 
-function genCalendar(year, month, familyData, extraImageFiles) {
+function genCalendar(year, month, familyData, extraImageFiles, extraEvents) {
+
+
+    console.log(`Generating calendar for ${year}-${month}...`);
+    console.log(extraEvents[0]);
+    console.log(extraEvents[1]);
+
 
 
     let events = createEvents(year, month);
@@ -246,12 +232,8 @@ function genCalendar(year, month, familyData, extraImageFiles) {
     events = events.concat([
         new MyEvent(new HebCal.HDate(11, 8, year), "Rachel Imeinu", "Rachel Imeinu", "פטירת רחל אמנו"),
         //new MyEvent(new HebCal.HDate(11, 8, 5785), "Rachel Imeinu", "Rachel Imeinu", "פטירת רחל אמנו"),
-        new MyEvent(new HebCal.HDate(new Date(2024, 9, 27)), "Winter Time", "Winter Time", "שעון חורף"),
-        new MyEvent(new HebCal.HDate(new Date(2025, 2, 28)), "Summer Time", "Summer Time", "שעון קיץ"),
+        ...extraEvents,
     ]);
-
-    let d = new HebCal.HDate(new Date(2025, 2, 28))
-    console.log(d)
 
     events.forEach(e => e.config = getEventConfig(e));
 
@@ -301,11 +283,49 @@ function combineAdars(events) {
     })
 }
 
+
+function addEventsToICal(outputDir, year, events) {
+
+    let calendar = ical({ name: `סיירת טרגין - ${year}` });
+    console.log(calendar.toString());
+
+    // dump all events to a file
+    try {
+        const eventsJson = JSON.stringify(events, null, 2);
+        fse.writeFileSync(`${outputDir}/fam_events.json`, eventsJson);
+    } catch (err) {
+        console.error(err);
+    }
+
+    events.forEach(e => {
+        let day = new Day(year, e.month, e.date, true)
+        let dt = day.fullEnglishDate;
+        let gmtDate = new Date(Date.UTC(dt.getFullYear(), dt.getMonth(), dt.getDate()));
+        calendar.createEvent({
+            start: gmtDate,
+            allDay: true,
+            categories: [{ name: e.type }],
+            summary: `${e.type}: ${e.name1} ${e.name2 ? 'ו' + e.name2 : ''}`,
+        });
+        // uid: `${e.desc}-${dt.getTime()}@hebcal.com`,
+    });
+    try {
+        fse.writeFileSync(`${outputDir}/calendar_${year}.ics`, calendar.toString());
+    } catch (err) {
+        console.error(err);
+    }
+
+
+}
+
+
 async function genYear(year, events) {
     fillIncomingData(events);
 
+    let extraEvents = getClockChangeEvents(year);
 
-    let outputDir = year.toString();
+
+    let outputDir = `out/${year}`;
 
     await fse.copy("template", outputDir);
     let extraImageFiles = {};
@@ -318,9 +338,10 @@ async function genYear(year, events) {
         combineAdars(events);
     }
 
+    addEventsToICal(outputDir, year, events);
 
     for (let i = 1; i <= monthCount; i++) {
-        let html = genCalendar(year, i, events, extraImageFiles);
+        let html = genCalendar(year, i, events, extraImageFiles, extraEvents);
         try {
             fse.writeFileSync(`${outputDir}/calendar_${year}_${i}.html`, html);
         } catch (err) {
@@ -330,19 +351,30 @@ async function genYear(year, events) {
 
 
 
-
     let str = JSON.stringify(alle);
     fse.writeFileSync(`holidayevents.json`, str);
 
 
     createExtraImageFiles(extraImageFiles, outputDir)
 
+        let hd = new HebCal.HDate(10, 6, 5786);
+
+        let localDate = hd.greg();
+        let gmtDate = new Date(Date.UTC(localDate.getFullYear(), localDate.getMonth(), localDate.getDate()));
+        console.log(`${hd} - ${localDate} - GMT: ${gmtDate}`);
+
+        let day = new Day(5786, 6, 10, 6);
+        console.log(`${day.hebrewDate} - ${day.fullEnglishDate}`);
+
+        // console.log(`${hd} - ${hd.gregEve()}`);
+
+
 }
 
 
 //genCalendar(5781, 3);
 
-module.exports = {
+export {
     genCalendar,
     genYear,
     MyEvent,

@@ -137,7 +137,7 @@ async function downloaddata(auth) {
             });
 
             let myArgs = process.argv.slice(2);
-            let year = 5786;
+            let year = 5787;
             if (myArgs.length >= 1) {
                 year = myArgs[0];
             }
