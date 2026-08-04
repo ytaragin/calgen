@@ -32,8 +32,14 @@ const IMGDIRS = {
     HOLIDAY: "holiday"
 }
 
+// Overrides the default hebcal Hebrew rendering for specific holidays.
+const HolidayDisplayOverrides = {
+    "Tzom Tammuz": 'י"ז תמוז'
+};
+
 function genHolidayDisplay(e) {
-    let parts = e.render(LANG).split('(');
+    const override = HolidayDisplayOverrides[e.desc];
+    let parts = (override ?? e.render(LANG)).split('(');
     return parts.join('<br>(');
 }
 
@@ -51,6 +57,20 @@ function getHolidayClass(e) {
 
 }
 
+function getImageName(e) {
+    return e.desc.split('(')[0].trim().replace(/:/g, '');
+}
+
+function getRHImageName(e) {
+    let name = getImageName(e);
+    // Two-day Rosh Chodesh: the 30th is the first day, so it gets its own image.
+    if (e.date.getDate() === 30) {
+        name += "_1";
+    }
+
+    return name;
+}
+
 const getEventConfig = (event) => {
     let config = {
         inTitle: false,
@@ -60,6 +80,7 @@ const getEventConfig = (event) => {
         dayClassPriority: 10,
         genPlaceHolder: false,
         getDisplay: e => e.render(LANG),
+        getImageName: getImageName,
     };
 
     if ((event instanceof HebCal.HavdalahEvent) ||
@@ -70,6 +91,7 @@ const getEventConfig = (event) => {
         config.inTitle = true;
         config.dayClass = "roshchodesh";
         config.genPlaceHolder = true;
+        config.getImageName = getRHImageName;
         dayClassPriority = 5;
     } else if (event instanceof HebCal.HolidayEvent) {
         config.inTitle = true;

@@ -221,9 +221,9 @@ let alle = [];
 function genCalendar(year, month, familyData, extraImageFiles, extraEvents) {
 
 
-    console.log(`Generating calendar for ${year}-${month}...`);
-    console.log(extraEvents[0]);
-    console.log(extraEvents[1]);
+    // console.log(`Generating calendar for ${year}-${month}...`);
+    // console.log(extraEvents[0]);
+    // console.log(extraEvents[1]);
 
 
 

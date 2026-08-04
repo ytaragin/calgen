@@ -108,8 +108,7 @@ function genEventPlaceholders(events, imageLists) {
     //    let filename = 
 
     filtered.forEach(e => {
-        let name = e.desc.split('(')[0].trim();
-        name = name.replace(/:/g, '');
+        let name = e.config.getImageName(e);
 
         let imgfile = `${IMGDIRS.EVENTS}/${name}.png`;
         html += `<div class="event-img-block"><img class="event-img" src="${imgfile}"></div>\n`;
