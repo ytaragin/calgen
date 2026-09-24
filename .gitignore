@@ -1,3 +1,7 @@
+# Secrets / tokens (see ../_secrets-to-migrate/ for backup)
+credentials.json
+token.json
+
 # Logs
 logs
 *.log
